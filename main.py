@@ -268,7 +268,8 @@ if __name__ == '__main__':
     if not os.path.exists("downloads/doSave.json"):
         doSave("2022-04-21 00:00:00","2022-04-21 23:59:59")
 
-    #id = list()
+    id = list()
+    print(id)
     #export(str(id))
-    sendPassword("40828666")
+    #sendPassword("40828666")
 
