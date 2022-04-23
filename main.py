@@ -1,3 +1,4 @@
+#-*- coding=utf-8 -*-
 from time import sleep
 import requests
 import sys
@@ -21,12 +22,26 @@ kf_name = {
     '闻毓': '闻毓',
     'tsurumatsu':'tsurumatsu'
 }
+# 客服值班表
+kf_zbb = {
+    '2022-04-22':'季雅囡',
+    '2022-04-23':'雷轩',
+    '2022-04-24':'丁沪婉',
+    '2022-04-25':'季雅囡',
+    '2022-04-26':'雷轩',
+    '2022-04-27':'丁沪婉',
+    '2022-04-28':'季雅囡',
+    '2022-04-29':'雷轩',
+    '2022-04-30':'丁沪婉'
+}
 kfs = [] # 客服人员
 sale = {
     '销售额':0,
     '订单总数':0,
     '取消订单数':0
-}
+} # 销售情况
+week_list = ["星期一","星期二","星期三","星期四","星期五","星期六","星期日"]
+
 
 def waiterSession(pageSize, startTime, endTime):
     '''客服管家->咚咚查询->客户咨询查询
@@ -367,6 +382,8 @@ def run_kefu_tj():
     for kfpin in kfs:
         workload( config.yesterday, config.yesterday,kfpin)
         sleep(config.duration)
+    
+    print("今日[{}]勤務中:{}, Doryoku!\n\n".format(week_list[config.today.weekday()], kf_zbb[str(config.today)]))
 
 
 def run_dingdan_tj():
@@ -380,8 +397,8 @@ def run_dingdan_tj():
     sleep(config.duration)
     export(taskid)
 
-    df = pd.read_csv('./downloads/{}/{}'.format(taskid, filename[0]), encoding = 'gb2312')
-    sale['销售额'] = df['京东价'].sum()
+    df = pd.read_csv('./downloads/{}/{}'.format(taskid, filename[0]), encoding = 'gbk')
+    sale['销售额'] = int(df['京东价'].sum())
     sale['订单总数'] = df.shape[0]
     for index, row in df.iterrows():
         if('删除' in row['订单状态']):
@@ -394,9 +411,9 @@ def run_dingdan_tj():
         print('phoneNumber:', phoneNumber)
         sleep(config.duration)
         df.loc[index,'联系电话'] = phoneNumber # 更新手机号码
-    df.to_excel('E:/客服销售表/temp/{}_{}排版销售表.xlsx'.format(config.today, 'lisa'), columns=['订单号','商品ID','商品名称','订购数量','支付方式','下单时间','京东价','订单金额','结算金额','余额支付','应付金额','订单状态','订单类型','下单帐号','客户姓名','客户地址','联系电话','订单备注'])
-    print("\n\n\n[{}]".format(config.yesterday))
-    print('销售额:{}元  订单总数:{}   取消订单:{}'.format(sale['销售额'], sale['订单总数'], sale['取消订单数']))
+    df.to_excel('E:/客服销售表/temp/{}_{}排版销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=['订单号','商品ID','商品名称','订购数量','支付方式','下单时间','京东价','订单金额','结算金额','余额支付','应付金额','订单状态','订单类型','下单帐号','客户姓名','客户地址','联系电话','订单备注'])
+    print("\n\n\n昨日[{}]".format(str(config.yesterday)))
+    print('销售额:{}元 订单总数:{} 取消订单:{}'.format(sale['销售额'], sale['订单总数'], sale['取消订单数']))
 
 if __name__ == '__main__':
     run_dingdan_tj()
