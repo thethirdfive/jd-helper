@@ -1,12 +1,9 @@
-import json
-import time
-import config
+from AES_SECRET import AES_ENCRYPT
 
-all = None
-with open("downloads/list.json",encoding="utf-8") as f:
-    all = json.load(f)
 
-print(all['pageModel']['itemList'][0]['createDate'])
-print(all['pageModel']['itemList'][0]['id'])
+if __name__ == '__main__':
+    aes_encrypt = AES_ENCRYPT()
+    mobile = 'Y7yUMqjFLhHW5sALAwsidA=='
+    phone = "13585096000"
 
-print(config.today_time)
+    print(aes_encrypt.decrypt(mobile))
