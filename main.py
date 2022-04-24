@@ -11,7 +11,7 @@ import AES_SECRET
 
 service = None  # 客服
 taskid = None  # 导出表格文件id
-filename = None  # 导出的文件名称
+filename = []  # 导出的文件名称
 passwd = None  # 文件密码
 kf_name = {
     'hesong-sansan': '丁沪婉',
@@ -252,6 +252,7 @@ def export(id):
         passwd = input("请输入收到的解压密码:")
         try:
             zfile = zipfile.ZipFile('downloads/{}.zip'.format(id), 'r')
+            global filename
             filename = zfile.namelist()
             print(filename)
             zfile.extractall('downloads/{}/'.format(id),
@@ -404,7 +405,7 @@ def run_dingdan_tj():
     sendPassword(taskid)
     sleep(config.duration)
     export(taskid)
-
+    sleep(config.duration) # 等待文件缓冲
     df = pd.read_csv('./downloads/{}/{}'.format(taskid,
                      filename[0]), encoding='gbk')
     sale['销售额'] = int(df['京东价'].sum())
@@ -420,7 +421,7 @@ def run_dingdan_tj():
         print('phoneNumber:', phoneNumber)
         sleep(config.duration)
         df.loc[index, '联系电话'] = phoneNumber  # 更新手机号码
-    df.to_excel('E:/客服销售表/temp/{}_{}排版销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
+    df.to_excel('E:/客服销售表/temp/{}_{}值班客服销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
                 '订单号', '商品ID', '商品名称', '订购数量', '支付方式', '下单时间', '京东价', '订单金额', '结算金额', '余额支付', '应付金额', '订单状态', '订单类型', '下单帐号', '客户姓名', '客户地址', '联系电话', '订单备注'])
     print("\n\n\n昨日[{}]".format(str(config.yesterday)))
     print('销售额:{}元 订单总数:{} 取消订单:{}'.format(
