@@ -24,15 +24,13 @@ kf_name = {
 }
 # 客服值班表
 kf_zbb = {
-    '2022-04-22': '季雅囡',
-    '2022-04-23': '雷轩',
-    '2022-04-24': '丁沪婉',
     '2022-04-25': '季雅囡',
     '2022-04-26': '雷轩',
     '2022-04-27': '丁沪婉',
     '2022-04-28': '季雅囡',
     '2022-04-29': '雷轩',
-    '2022-04-30': '丁沪婉'
+    '2022-04-30': '丁沪婉',
+    '2022-05-01': '季雅囡'
 }
 kfs = []  # 客服人员
 sale = {
@@ -383,13 +381,15 @@ def run_kefu_tj():
 
     '''
     waiterSession(100, config.yesterday, config.yesterday)
+    print('-----------------------------------')
     sleep(config.duration)
     orderDetail(100, config.yesterday, config.yesterday)
+    print('-----------------------------------')
     sleep(config.duration)
     for kfpin in kfs:
         workload(config.yesterday, config.yesterday, kfpin)
         sleep(config.duration)
-
+    print('-----------------------------------')
     print("今日[{}]勤務中:{}, Doryoku!\n\n".format(
         week_list[config.today.weekday()], kf_zbb[str(config.today)]))
 
@@ -424,7 +424,7 @@ def run_dingdan_tj():
     df.to_excel('E:/客服销售表/temp/{}_{}值班客服销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
                 '订单号', '商品ID', '商品名称', '订购数量', '支付方式', '下单时间', '京东价', '订单金额', '结算金额', '余额支付', '应付金额', '订单状态', '订单类型', '下单帐号', '客户姓名', '客户地址', '联系电话', '订单备注'])
     print("\n\n\n昨日[{}]".format(str(config.yesterday)))
-    print('销售额:{}元 订单总数:{} 取消订单:{}'.format(
+    print('销售额:{}元 订单总数:{} 取消订单:{}\n-----------------------------------'.format(
         sale['销售额'], sale['订单总数'], sale['取消订单数']))
 
 
