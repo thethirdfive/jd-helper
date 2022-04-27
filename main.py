@@ -8,6 +8,7 @@ import zipfile
 import pandas as pd
 from bs4 import BeautifulSoup
 import AES_SECRET
+import pyperclip
 
 service = None  # 客服
 taskid = None  # 导出表格文件id
@@ -17,10 +18,28 @@ kf_name = {
     'hesong-sansan': '丁沪婉',
     'hesong-leixuan': '雷轩',
     '鹤松医药011': '季雅囡',
-    '鹤松医药008': '兜底组008',
-    '鹤松009': '兜底组009',
+    '鹤松医药008': '008',
+    '鹤松009': '009',
     '闻毓': '闻毓',
     'tsurumatsu': 'tsurumatsu'
+}
+kf_sum_jd ={
+    'hesong-sansan': 0,
+    'hesong-leixuan': 0,
+    '鹤松医药011': 0,
+    '鹤松医药008': 0,
+    '鹤松009': 0,
+    '闻毓': 0,
+    'tsurumatsu': 0
+}
+kf_sum_cc ={
+    'hesong-sansan': 0,
+    'hesong-leixuan': 0,
+    '鹤松医药011': 0,
+    '鹤松医药008': 0,
+    '鹤松009': 0,
+    '闻毓': 0,
+    'tsurumatsu': 0
 }
 # 客服值班表
 kf_zbb = {
@@ -72,10 +91,12 @@ def waiterSession(pageSize, startTime, endTime):
         res = r.json()
         df = pd.json_normalize(res['waiterSessionList'])
         #df = pd.json_normalize(res['waiterSessionList']).loc[:,['service','sessionTypeDesc','customerMsgNum','waiterMsgNum']]
-        kfsum = df['service'].value_counts()
-        for kf in kfsum.index:
+        sum = df['service'].value_counts()
+        for kf in sum.index:
             kfs.append(kf)
-            print("{}接待{}人".format(kf_name[kf], kfsum[kf]))
+            global kf_sum_jd
+            kf_sum_jd[kf] = sum[kf]
+            print("{}接待{}人".format(kf_name[kf], sum[kf]))
 
 
 def orderDetail(pageSize, startTime, endTime):
@@ -110,9 +131,11 @@ def orderDetail(pageSize, startTime, endTime):
         res = r.json()
         if(res['totalRecordNum'] != 0):
             df = pd.json_normalize(res['orderDetailList'])
-            kfsum = df['service'].value_counts()
-            for kf in kfsum.index:
-                print("{}促成{}单".format(kf_name[kf], kfsum[kf]))
+            sum = df['service'].value_counts()
+            for kf in sum.index:
+                global kf_sum_cc
+                kf_sum_cc[kf] = sum[kf]
+                print("{}促成{}单".format(kf_name[kf], sum[kf]))
 
 
 def workload(startTime, endTime, servicePin):
@@ -381,15 +404,15 @@ def run_kefu_tj():
 
     '''
     waiterSession(100, config.yesterday, config.yesterday)
-    print('-----------------------------------')
+    print('------------------------------')
     sleep(config.duration)
     orderDetail(100, config.yesterday, config.yesterday)
-    print('-----------------------------------')
+    print('------------------------------')
     sleep(config.duration)
     for kfpin in kfs:
         workload(config.yesterday, config.yesterday, kfpin)
         sleep(config.duration)
-    print('-----------------------------------')
+    print('------------------------------')
     print("今日[{}]勤務中:{}, Doryoku!\n\n".format(
         week_list[config.today.weekday()], kf_zbb[str(config.today)]))
 
@@ -408,7 +431,7 @@ def run_dingdan_tj():
     sleep(config.duration) # 等待文件缓冲
     df = pd.read_csv('./downloads/{}/{}'.format(taskid,
                      filename[0]), encoding='gbk')
-    sale['销售额'] = int(df['京东价'].sum())
+    
     sale['订单总数'] = df.shape[0]
     for index, row in df.iterrows():
         if('删除' in row['订单状态']):
@@ -424,10 +447,26 @@ def run_dingdan_tj():
     df.to_excel('E:/客服销售表/temp/{}_{}值班客服销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
                 '订单号', '商品ID', '商品名称', '订购数量', '支付方式', '下单时间', '京东价', '订单金额', '结算金额', '余额支付', '应付金额', '订单状态', '订单类型', '下单帐号', '客户姓名', '客户地址', '联系电话', '订单备注'])
     print("\n\n\n昨日[{}]".format(str(config.yesterday)))
-    print('销售额:{}元 订单总数:{} 取消订单:{}\n-----------------------------------'.format(
-        sale['销售额'], sale['订单总数'], sale['取消订单数']))
+    print('订单总数:{}\n------------------------------'.format((sale['订单总数'] - sale['取消订单数'])))
 
 
 if __name__ == '__main__':
     run_dingdan_tj()
     run_kefu_tj()
+
+    
+    sum_jd = 0# 接待总数
+    sum_cc= 0# 促成总数
+    prt_str_jd = ''# 接待
+    prt_str_cc = ''# 促成
+    for kf in kfs:
+        prt_str_jd = prt_str_jd + ',{}接待{}位'.format(kf_name[kf], kf_sum_jd[kf])
+        if(kf_sum_cc[kf] != 0):
+            prt_str_cc = prt_str_cc + ',{}接待{}位'.format(kf_name[kf], kf_sum_cc[kf])
+        sum_jd = sum_jd + kf_sum_jd[kf]
+        sum_cc = sum_cc + kf_sum_cc[kf]
+    sum_dd = sale['订单总数'] - sale['取消订单数']
+    text = "[{}]共接待{}位{};共下单{}位{},{}位未咨询".format(str(config.yesterday), sum_jd, prt_str_jd, sum_dd, prt_str_cc, (sum_dd - sum_cc))
+    pyperclip.copy(text)
+    print("\n\n\n{}\n\n\n".format(text))
+
