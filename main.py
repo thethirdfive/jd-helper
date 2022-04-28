@@ -9,6 +9,7 @@ import pandas as pd
 from bs4 import BeautifulSoup
 import AES_SECRET
 import pyperclip
+from logger import logger
 
 service = None  # 客服
 taskid = None  # 导出表格文件id
@@ -21,7 +22,12 @@ kf_name = {
     '鹤松医药008': '008',
     '鹤松009': '009',
     '闻毓': '闻毓',
-    'tsurumatsu': 'tsurumatsu'
+    'tsurumatsu': 'tsurumatsu',
+    'tsu_liyushu': '李玉书',
+    '鹤松-朱总': '鹤松-朱总',
+    'hesongdaiyunying': 'hesongdaiyunying',
+    'tsurumatsuwang': 'tsurumatsuwang'
+
 }
 kf_sum_jd ={
     'hesong-sansan': 0,
@@ -30,7 +36,11 @@ kf_sum_jd ={
     '鹤松医药008': 0,
     '鹤松009': 0,
     '闻毓': 0,
-    'tsurumatsu': 0
+    'tsurumatsu': 0,
+    'tsu_liyushu': 0,
+    '鹤松-朱总': 0,
+    'hesongdaiyunying': 0,
+    'tsurumatsuwang': 0
 }
 kf_sum_cc ={
     'hesong-sansan': 0,
@@ -39,7 +49,11 @@ kf_sum_cc ={
     '鹤松医药008': 0,
     '鹤松009': 0,
     '闻毓': 0,
-    'tsurumatsu': 0
+    'tsurumatsu': 0,
+    'tsu_liyushu': 0,
+    '鹤松-朱总': 0,
+    'hesongdaiyunying': 0,
+    'tsurumatsuwang': 0
 }
 # 客服值班表
 kf_zbb = {
@@ -96,7 +110,7 @@ def waiterSession(pageSize, startTime, endTime):
             kfs.append(kf)
             global kf_sum_jd
             kf_sum_jd[kf] = sum[kf]
-            print("{}接待{}人".format(kf_name[kf], sum[kf]))
+            logger.info("{}接待{}人".format(kf_name[kf], sum[kf]))
 
 
 def orderDetail(pageSize, startTime, endTime):
@@ -135,7 +149,9 @@ def orderDetail(pageSize, startTime, endTime):
             for kf in sum.index:
                 global kf_sum_cc
                 kf_sum_cc[kf] = sum[kf]
-                print("{}促成{}单".format(kf_name[kf], sum[kf]))
+                logger.info("{}促成{}单".format(kf_name[kf], sum[kf]))
+    else:
+        logger.error("促成订单查询,返回http错误")
 
 
 def workload(startTime, endTime, servicePin):
@@ -170,8 +186,10 @@ def workload(startTime, endTime, servicePin):
     if r.status_code == 200:
         r.encoding = 'utf-8'
         res = r.json()
-        print("{}在线时长：{}小时".format(
+        logger.info("{}在线时长：{}小时".format(
             kf_name[servicePin], res['totalDetail']['onlineTime']))
+    else:
+        logger.error("工作量（前日一天）,返回http错误")
 
 
 def doSave(startDate, endDate):
@@ -204,8 +222,9 @@ def doSave(startDate, endDate):
     if r.status_code == 200:
         r.encoding = 'utf-8'
         res = r.json()
+
         if(res['success']):
-            print("创建导出任务完成！")
+            logger.info("创建导出任务完成！")
 
 
 def list():
@@ -238,7 +257,7 @@ def list():
         res = r.json()
         global taskid
         taskid = res['pageModel']['itemList'][0]['id']
-        print("获取最新的导出文件ID:{}".format(taskid))
+        logger.info("获取最新的导出文件ID:{}".format(taskid))
 
 
 def export(id):
@@ -275,13 +294,13 @@ def export(id):
             zfile = zipfile.ZipFile('downloads/{}.zip'.format(id), 'r')
             global filename
             filename = zfile.namelist()
-            print(filename)
+            logger.info(filename)
             zfile.extractall('downloads/{}/'.format(id),
                              pwd=passwd.encode('utf-8'))
-            print("导出表格文件完成")
+            logger.info("导出表格文件完成")
 
         except:
-            print("解压密码错误！")
+            logger.error("解压密码错误！")
 
 
 def sendPassword(id):
@@ -314,7 +333,9 @@ def sendPassword(id):
         r.encoding = 'utf-8'
         res = r.json()
         if(res['success']):
-            print("发送验证码完成，返回:{}".format(res['data']))
+            logger.info("发送验证码完成，返回:{}".format(res['data']))
+    else:
+        logger.error("发送验证码错误")
 
 
 def getOrderDetail(orderId):
@@ -348,9 +369,10 @@ def getOrderDetail(orderId):
             viewOrderPhone = soup.find(id="viewOrderPhone")
             return viewOrderPhone.attrs['accesskey'][0]
         except:
-            print("获取accesskey错误!")
+            logger.error("获取accesskey错误!")
             return ""
     else:
+        logger.error("获取accesskey错误http返回错误!")
         return ""
 
 
@@ -391,9 +413,10 @@ def phoneSensltiveInfo(orderId, accessKey):
             aes_secret = AES_SECRET.AES_ENCRYPT()
             return aes_secret.decrypt(mobile).decode()
         except:
-            print("获取手机号码错误！")
+            logger.error("获取手机号码错误！")
             return ""
     else:
+        logger.error("获取手机号码错误,返回http错误")
         return ""
 
 
@@ -404,16 +427,13 @@ def run_kefu_tj():
 
     '''
     waiterSession(100, config.yesterday, config.yesterday)
-    print('------------------------------')
     sleep(config.duration)
     orderDetail(100, config.yesterday, config.yesterday)
-    print('------------------------------')
     sleep(config.duration)
     for kfpin in kfs:
         workload(config.yesterday, config.yesterday, kfpin)
         sleep(config.duration)
-    print('------------------------------')
-    print("今日[{}]勤務中:{}, Doryoku!\n\n".format(
+    logger.info("今日[{}]勤務中:{}, Doryoku!".format(
         week_list[config.today.weekday()], kf_zbb[str(config.today)]))
 
 
@@ -436,25 +456,25 @@ def run_dingdan_tj():
     for index, row in df.iterrows():
         if('删除' in row['订单状态']):
             sale['取消订单数'] = sale['取消订单数'] + 1
-        print('订单号:', row['订单号'])
+        logger.info('订单号:', row['订单号'])
         accesskey = getOrderDetail(row['订单号'])
-        print('accesskey:', accesskey)
+        logger.info('accesskey:', accesskey)
         sleep(config.duration)
         phoneNumber = phoneSensltiveInfo(row['订单号'], accesskey)
-        print('phoneNumber:', phoneNumber)
+        logger.info('phoneNumber:', phoneNumber)
         sleep(config.duration)
         df.loc[index, '联系电话'] = phoneNumber  # 更新手机号码
     df.to_excel('E:/客服销售表/temp/{}_{}值班客服销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
                 '订单号', '商品ID', '商品名称', '订购数量', '支付方式', '下单时间', '京东价', '订单金额', '结算金额', '余额支付', '应付金额', '订单状态', '订单类型', '下单帐号', '客户姓名', '客户地址', '联系电话', '订单备注'])
-    print("\n\n\n昨日[{}]".format(str(config.yesterday)))
-    print('订单总数:{}\n------------------------------'.format((sale['订单总数'] - sale['取消订单数'])))
+    #print("\n\n\n昨日[{}]".format(str(config.yesterday)))
+    #print('订单总数:{}\n------------------------------'.format((sale['订单总数'] - sale['取消订单数'])))
+    logger.info("获取订单手机号码完成,导出销售表!")
 
 
 if __name__ == '__main__':
     run_dingdan_tj()
     run_kefu_tj()
 
-    
     sum_jd = 0# 接待总数
     sum_cc= 0# 促成总数
     prt_str_jd = ''# 接待
@@ -468,5 +488,5 @@ if __name__ == '__main__':
     sum_dd = sale['订单总数'] - sale['取消订单数']
     text = "[{}]共接待{}位{};共下单{}位{},{}位未咨询".format(str(config.yesterday), sum_jd, prt_str_jd, sum_dd, prt_str_cc, (sum_dd - sum_cc))
     pyperclip.copy(text)
-    print("\n\n\n{}\n\n\n".format(text))
+    logger.info(text)
 

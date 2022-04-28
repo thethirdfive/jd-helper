@@ -1,7 +1,7 @@
 import pandas as pd
 import config
 import pyperclip
-
+from logger import logger
 
 kf_name = {
     'hesong-sansan': '丁沪婉',
@@ -35,6 +35,7 @@ sum_jd = 0# 接待总数
 sum_cc= 0# 促成总数
 prt_str_jd = ''# 接待
 prt_str_cc = ''# 促成
+
 for kf in kfs:
     prt_str_jd = prt_str_jd + ', {}接待{}位'.format(kf_name[kf], kf_sum_jd[kf])
     if(kf_sum_cc[kf] != 0):
@@ -44,4 +45,5 @@ for kf in kfs:
 sum_dd = 23
 text = "[{}]共接待{}位{}; 共下单{}位{},{}位未咨询".format(str(config.yesterday), sum_jd, prt_str_jd, sum_dd, prt_str_cc, (sum_dd - sum_cc))
 pyperclip.copy(text)
+logger.info(text)
 print("\n\n\n{}\n\n\n".format(text))
