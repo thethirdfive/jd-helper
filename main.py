@@ -57,13 +57,13 @@ kf_sum_cc ={
 }
 # 客服值班表
 kf_zbb = {
-    '2022-04-25': '季雅囡',
-    '2022-04-26': '雷轩',
-    '2022-04-27': '丁沪婉',
-    '2022-04-28': '季雅囡',
-    '2022-04-29': '雷轩',
-    '2022-04-30': '丁沪婉',
-    '2022-05-01': '季雅囡'
+    '2022-06-01': '雷轩',
+    '2022-06-02': '丁沪婉',
+    '2022-06-03': '季雅囡',
+    '2022-06-04': '雷轩',
+    '2022-06-05': '丁沪婉',
+    '2022-06-06': '季雅囡',
+    '2022-06-07': '雷轩'
 }
 kfs = []  # 客服人员
 sale = {
@@ -456,12 +456,12 @@ def run_dingdan_tj():
     for index, row in df.iterrows():
         if('删除' in row['订单状态']):
             sale['取消订单数'] = sale['取消订单数'] + 1
-        logger.info('订单号:', row['订单号'])
+        logger.info('订单号:{}'.format(row['订单号']))
         accesskey = getOrderDetail(row['订单号'])
-        logger.info('accesskey:', accesskey)
+        logger.info('accesskey:{}'.format(accesskey))
         sleep(config.duration)
         phoneNumber = phoneSensltiveInfo(row['订单号'], accesskey)
-        logger.info('phoneNumber:', phoneNumber)
+        logger.info('phoneNumber:{}'.format(phoneNumber))
         sleep(config.duration)
         df.loc[index, '联系电话'] = phoneNumber  # 更新手机号码
     df.to_excel('E:/客服销售表/temp/{}_{}值班客服销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
