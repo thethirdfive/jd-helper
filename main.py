@@ -16,6 +16,9 @@ taskid = None  # 导出表格文件id
 filename = []  # 导出的文件名称
 passwd = None  # 文件密码
 kf_name = {
+    'hesong-mafh': '马凤华',
+    'hesong-zhangxg': '张宪刚',
+    'hesong-xinyue': '闻毓xy',
     'hesong-sansan': '丁沪婉',
     'hesong-leixuan': '雷轩',
     '鹤松医药011': '季雅囡',
@@ -30,6 +33,9 @@ kf_name = {
 
 }
 kf_sum_jd ={
+    'hesong-mafh': 0,
+    'hesong-zhangxg': 0,
+    'hesong-xinyue': 0,
     'hesong-sansan': 0,
     'hesong-leixuan': 0,
     '鹤松医药011': 0,
@@ -43,6 +49,9 @@ kf_sum_jd ={
     'tsurumatsuwang': 0
 }
 kf_sum_cc ={
+    'hesong-mafh': 0,
+    'hesong-zhangxg': 0,
+    'hesong-xinyue': 0,
     'hesong-sansan': 0,
     'hesong-leixuan': 0,
     '鹤松医药011': 0,
@@ -57,15 +66,13 @@ kf_sum_cc ={
 }
 # 客服值班表
 kf_zbb = {
-    '2022-06-01': '雷轩',
-    '2022-06-02': '丁沪婉',
-    '2022-06-03': '季雅囡',
-    '2022-06-04': '雷轩',
-    '2022-06-05': '丁沪婉',
-    '2022-06-06': '季雅囡',
-    '2022-06-07': '雷轩'
+    '2022-06-13': '闻毓',
+    '2022-06-14': '季雅囡',
+    '2022-06-15': '雷轩',
+    '2022-06-16': '丁沪婉',
+    '2022-06-17': '张宪刚'
 }
-kfs = []  # 客服人员
+kfs = []  # 客服人员，参与接待的
 sale = {
     '销售额': 0,
     '订单总数': 0,
@@ -486,7 +493,7 @@ if __name__ == '__main__':
         sum_jd = sum_jd + kf_sum_jd[kf]
         sum_cc = sum_cc + kf_sum_cc[kf]
     sum_dd = sale['订单总数'] - sale['取消订单数']
-    text = "[{}]共接待{}位{};共下单{}位{},{}位未咨询".format(str(config.yesterday), sum_jd, prt_str_jd, sum_dd, prt_str_cc, (sum_dd - sum_cc))
+    text = "[{}]共接待{}位{};共下单{}位{},{}位未咨询,售后 位".format(str(config.yesterday), sum_jd, prt_str_jd, sum_dd, prt_str_cc, (sum_dd - sum_cc))
     pyperclip.copy(text)
     logger.info(text)
 
