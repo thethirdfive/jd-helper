@@ -11,9 +11,7 @@ import AES_SECRET
 import pyperclip
 from logger import logger
 from selenium import webdriver
-
-
-browser = webdriver.Chrome()
+from datetime import datetime
 
 service = None  # 客服
 taskid = None  # 导出表格文件id
@@ -68,8 +66,6 @@ kf_sum_cc = {
     'hesongdaiyunying': 0,
     'tsurumatsuwang': 0
 }
-# 客服值班表
-kf_zbb = config.kf_zbb
 
 kfs = []  # 客服人员，参与接待的
 sale = {
@@ -78,6 +74,22 @@ sale = {
     '取消订单数': 0
 }  # 销售情况
 week_list = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"]
+
+kf_zbb = {}
+
+
+def gen_kf_zbb():
+    '''生成客服值班表
+    '''
+    # 客服值班顺序
+    kf = ['季雅囡', '雷轩', '丁沪婉', '闻毓', '张宪刚', '马凤华']
+    #生成日期列表
+    dlist = [datetime.strftime(
+        x, '%Y-%m-%d') for x in list(pd.date_range(start='2022-06-14', end='2022-12-31'))]
+    i = 0
+    for d in dlist:
+        kf_zbb[d] = kf[i % kf.__len__()]
+        i += 1
 
 
 def waiterSession(pageSize, startTime, endTime):
@@ -233,7 +245,7 @@ def doSave(startDate, endDate):
             logger.info("创建导出任务完成！")
 
 
-def list():
+def listexport():
     '''导出列表->获取最新的导出文件ID
     https://export.shop.jd.com/exportCenter/list
     '''
@@ -449,7 +461,7 @@ def run_dingdan_tj():
     doSave("{}{}".format(config.yesterday, " 00:00:00"),
            "{}{}".format(config.yesterday, " 23:59:59"))
     sleep(config.duration)
-    list()
+    listexport()
     sleep(config.duration)
     sendPassword(taskid)
     sleep(config.duration)
@@ -478,6 +490,7 @@ def run_dingdan_tj():
 
 
 if __name__ == '__main__':
+    browser = webdriver.Chrome()
     browser.get("http://shop.jd.com/")
     while('NMN日本鶴松海外官方旗舰店' not in browser.page_source):
         logger.info("请扫描二维码登陆")
@@ -487,6 +500,7 @@ if __name__ == '__main__':
         [item["name"] + "=" + item["value"] + "" for item in cookie_list])
     logger.info("获取cookies成功")
 
+    gen_kf_zbb()
     run_dingdan_tj()
     run_kefu_tj()
 

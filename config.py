@@ -1,10 +1,6 @@
 import time
 import datetime
 
-# 客服值班表
-with open('kf_zbb.conf','r') as f:
-    kf_zbb = f.read()
-# 基本配置
 cookie = ''
 duration = 3  # 执行间隔时间秒
 run_type = 1  # 类型
