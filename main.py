@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from time import sleep
 import requests
-import sys
+import time
 import config
 import AES_SECRET
 import zipfile
@@ -10,6 +10,10 @@ from bs4 import BeautifulSoup
 import AES_SECRET
 import pyperclip
 from logger import logger
+from selenium import webdriver
+
+
+browser = webdriver.Chrome()
 
 service = None  # 客服
 taskid = None  # 导出表格文件id
@@ -66,11 +70,12 @@ kf_sum_cc ={
 }
 # 客服值班表
 kf_zbb = {
-    '2022-06-13': '闻毓',
     '2022-06-14': '季雅囡',
     '2022-06-15': '雷轩',
     '2022-06-16': '丁沪婉',
-    '2022-06-17': '张宪刚'
+    '2022-06-17': '闻毓',
+    '2022-06-18': '张宪刚',
+    '2022-06-19': '马凤华'
 }
 kfs = []  # 客服人员，参与接待的
 sale = {
@@ -372,7 +377,7 @@ def getOrderDetail(orderId):
     r = requests.get(url=url, params=payload, headers=headers)
     if r.status_code == 200:
         try:
-            soup = BeautifulSoup(r.content, 'lxml')
+            soup = BeautifulSoup(r.content, 'html.parser')
             viewOrderPhone = soup.find(id="viewOrderPhone")
             return viewOrderPhone.attrs['accesskey'][0]
         except:
@@ -471,7 +476,7 @@ def run_dingdan_tj():
         logger.info('phoneNumber:{}'.format(phoneNumber))
         sleep(config.duration)
         df.loc[index, '联系电话'] = phoneNumber  # 更新手机号码
-    df.to_excel('E:/客服销售表/temp/{}_{}值班客服销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
+    df.to_excel('/Users/yushuli/Documents/客服销售表/temp/{}_{}值班客服销售表.xlsx'.format(str(config.yesterday), kf_zbb[str(config.yesterday)]), columns=[
                 '订单号', '商品ID', '商品名称', '订购数量', '支付方式', '下单时间', '京东价', '订单金额', '结算金额', '余额支付', '应付金额', '订单状态', '订单类型', '下单帐号', '客户姓名', '客户地址', '联系电话', '订单备注'])
     #print("\n\n\n昨日[{}]".format(str(config.yesterday)))
     #print('订单总数:{}\n------------------------------'.format((sale['订单总数'] - sale['取消订单数'])))
@@ -479,6 +484,14 @@ def run_dingdan_tj():
 
 
 if __name__ == '__main__':
+    browser.get("http://shop.jd.com/")
+    while('NMN日本鶴松海外官方旗舰店' not in browser.page_source):
+        logger.info("请扫描二维码登陆")
+        time.sleep(5)
+    cookie_list = browser.get_cookies()
+    config.cookie = ";".join([item["name"] +"=" + item["value"] +""  for item in cookie_list])
+    logger.info("获取cookies成功")
+
     run_dingdan_tj()
     run_kefu_tj()
 

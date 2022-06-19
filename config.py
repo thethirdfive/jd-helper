@@ -1,18 +1,19 @@
 import time
 import datetime
 
-#需要新建config.txt复制cookie
-with open('config.txt','r') as f:
-    cookie = f.read()
+# 需要新建config.txt复制cookie
+# with open('config.txt','r') as f:
+#    cookie = f.read()
 # 基本配置
+cookie = ''
 duration = 3  # 执行间隔时间秒
 run_type = 1  # 类型
 today = datetime.date.today()
 yesterday = today - datetime.timedelta(days=1)
 
-today_date = time.strftime("%Y-%m-%d",time.localtime())
-today_time = time.strftime("%Y-%m-%d %H:%M:%S",time.localtime())
-today_time_title = time.strftime("%Y-%m-%d_%H-%M-%S",time.localtime())
+today_date = time.strftime("%Y-%m-%d", time.localtime())
+today_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+today_time_title = time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
 
 ua = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36'
 AcceptEncoding = 'gzip, deflate, br'
@@ -32,4 +33,3 @@ Host_export = 'export.shop.jd.com'
 Accept_export = 'application/json, text/plain, */*'
 ContentType_export = 'application/x-www-form-urlencoded;charset=UTF-8'
 Sec_Fetch_Site_export = 'same-origin'
-

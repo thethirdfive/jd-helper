@@ -6,3 +6,8 @@
 
 ## 销售订单导出
 每日订单导出，获取客户联系方式，更新表格
+
+## mac与windows平台的不同
+MAC安装时注意升级pip，然后安装python虚拟环境。
+soup = BeautifulSoup(r.content, 'html.parser')这个地方不同
+
