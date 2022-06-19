@@ -1,9 +1,9 @@
 import time
 import datetime
 
-# 需要新建config.txt复制cookie
-# with open('config.txt','r') as f:
-#    cookie = f.read()
+# 客服值班表
+with open('kf_zbb.conf','r') as f:
+    kf_zbb = f.read()
 # 基本配置
 cookie = ''
 duration = 3  # 执行间隔时间秒
