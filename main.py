@@ -17,54 +17,17 @@ service = None  # 客服
 taskid = None  # 导出表格文件id
 filename = []  # 导出的文件名称
 passwd = None  # 文件密码
+#更换为自己公司的人员ID和名字
 kf_name = {
-    'hesong-mafh': '马凤华',
-    'hesong-zhangxg': '张宪刚',
-    'hesong-xinyue': '闻毓xy',
-    'hesong-sansan': '丁沪婉',
-    'hesong-leixuan': '雷轩',
-    '鹤松医药011': '季雅囡',
-    '鹤松医药008': '008',
-    '鹤松009': '009',
-    '闻毓': '闻毓',
-    'tsurumatsu': 'tsurumatsu',
-    'tsu_liyushu': '李玉书',
-    '鹤松-朱总': '鹤松-朱总',
-    'hesongdaiyunying': 'hesongdaiyunying',
-    'tsurumatsuwang': 'tsurumatsuwang'
-
+    'id': 'name'
 }
+#更换为自己公司的人员ID
 kf_sum_jd = {
-    'hesong-mafh': 0,
-    'hesong-zhangxg': 0,
-    'hesong-xinyue': 0,
-    'hesong-sansan': 0,
-    'hesong-leixuan': 0,
-    '鹤松医药011': 0,
-    '鹤松医药008': 0,
-    '鹤松009': 0,
-    '闻毓': 0,
-    'tsurumatsu': 0,
-    'tsu_liyushu': 0,
-    '鹤松-朱总': 0,
-    'hesongdaiyunying': 0,
-    'tsurumatsuwang': 0
+    'id': 0
 }
+#更换为自己公司的人员ID
 kf_sum_cc = {
-    'hesong-mafh': 0,
-    'hesong-zhangxg': 0,
-    'hesong-xinyue': 0,
-    'hesong-sansan': 0,
-    'hesong-leixuan': 0,
-    '鹤松医药011': 0,
-    '鹤松医药008': 0,
-    '鹤松009': 0,
-    '闻毓': 0,
-    'tsurumatsu': 0,
-    'tsu_liyushu': 0,
-    '鹤松-朱总': 0,
-    'hesongdaiyunying': 0,
-    'tsurumatsuwang': 0
+    'id': 0
 }
 
 kfs = []  # 客服人员，参与接待的
@@ -82,7 +45,7 @@ def gen_kf_zbb():
     '''生成客服值班表
     '''
     # 客服值班顺序
-    kf = ['季雅囡', '雷轩', '丁沪婉', '闻毓', '张宪刚', '马凤华']
+    kf = ['name1', 'name2']
     #生成日期列表
     dlist = [datetime.strftime(
         x, '%Y-%m-%d') for x in list(pd.date_range(start='2022-06-14', end='2022-12-31'))]

@@ -2,6 +2,7 @@ from ast import IsNot
 from operator import is_not
 from queue import Empty
 import pandas as pd
+import config
 
 
 def HS_goods_code():
@@ -9,7 +10,7 @@ def HS_goods_code():
     '''
     df1 = pd.read_excel(io="./data/pop店售卖商品简码ALL.xlsx")
     df2 = pd.read_excel(
-        io="./data/已备案信息查询_20220619152156.xls", sheet_name=[0, 1])
+        io="./data/已备案信息查询_20220711092149.xls", sheet_name=[0, 1])
 
     # print(df2[1].loc[1])
     df_for_check = df1[['商品名称(简称)', '套装规格', '事业部商品编码', '商家商品编码（SKU）']]
@@ -31,7 +32,7 @@ def HS_goods_code():
     df_reult = pd.DataFrame(new_df, columns=[
                             '商品名称(简称)', '套装规格', '事业部商品编码', '商家商品编码（SKU）', 'SKU', 'UPC', '商品名称（中文）', '商品货号'])
     # 保存到本地excel
-    df_reult.to_excel("./data/鹤松商品编码.xlsx", index=False)
+    df_reult.to_excel("./data/鹤松商品编码new.xlsx", index=False)
     print("\n\t*Processing completed to excel*\n")
 
 
@@ -40,7 +41,7 @@ def format_kucun():
     '''
     df1 = pd.read_excel(io="./data/pop店售卖商品简码ALL.xlsx")
     df2 = pd.read_csv(
-        "./data/stock-report-shopStock-reporttsu_liyushu_1655621588234.csv", encoding='gbk')
+        "/Users/yushuli/Downloads/{}.csv".format("stock-report-shopStock-reporttsu_liyushu_1657518440589"), encoding='gbk')
 
     # print(df2[1].loc[1])
     df_for_check = df1[['商品名称(简称)', '套装规格', '事业部商品编码', '商家商品编码（SKU）']]
@@ -64,12 +65,13 @@ def format_kucun():
     df_reult = df_reult[['商品名称(简称)', '套装规格', '库存数量',
                          '事业部商品编码', '商家商品编码（SKU）', '商家商品编码']]
     
-    df_reult = df_reult.sort_values(by=['库存数量'], ascending=True)
+    df_reult = df_reult.sort_values(by=['库存数量'])
     
     # 保存到本地excel
-    df_reult.to_excel("./data/商品库存查询.xlsx", index=False)
-    print("\n\t*Processing completed to excel*\n")
+    df_reult.to_excel("/Users/yushuli/Downloads/(auto)商品库存查询_{}.xlsx".format(str(config.today)), index=False)
+    print("\n\t*生成文件完成！*\n")
 
 
 if __name__ == '__main__':
+    #HS_goods_code()
     format_kucun()
